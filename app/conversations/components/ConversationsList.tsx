@@ -11,12 +11,14 @@ import { find, uniq } from "lodash";
 import useConversation from "@/app/hooks/useConversation";
 import { FullConversationType } from "@/app/types";
 import ConversationBox from "@/app/conversations/components/ConversationBox";
+import GroupChatModal from "@/app/conversations/components/GroupChatModal";
 
 interface ConversationListProps {
   initialItems: FullConversationType[];
+  users: User[];
 }
 
-const ConversationList = ({ initialItems }: ConversationListProps) => {
+const ConversationList = ({ initialItems, users }: ConversationListProps) => {
   const [items, setItems] = useState(initialItems);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,6 +29,11 @@ const ConversationList = ({ initialItems }: ConversationListProps) => {
 
   return (
     <>
+      <GroupChatModal
+        users={users}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
       <aside
         className={clsx(
           `
@@ -62,13 +69,15 @@ const ConversationList = ({ initialItems }: ConversationListProps) => {
               <MdOutlineGroupAdd size={20} />
             </div>
           </div>
-          {items.map((item) => (
-            <ConversationBox
-              key={item.id}
-              data={item}
-              selected={conversationId === item.id}
-            />
-          ))}
+          <div className="flex flex-col space-y-1">
+            {items.map((item) => (
+              <ConversationBox
+                key={item.id}
+                data={item}
+                selected={conversationId === item.id}
+              />
+            ))}
+          </div>
         </div>
       </aside>
     </>

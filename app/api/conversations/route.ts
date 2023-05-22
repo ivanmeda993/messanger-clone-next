@@ -4,6 +4,7 @@ import prismadb from "@/app/libs/prismadb";
 
 export async function POST(req: Request) {
   try {
+    console.log("POST /api/conversations", req.body);
     const currentUser = await getCurrentUser();
     const body = await req.json();
     const { userId, isGroup, members, name } = body;
@@ -12,10 +13,12 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
     if (isGroup && (!members || members?.length < 2 || !name)) {
+      console.log("check group members and name", members, name);
       return new NextResponse("Bad Request", { status: 400 });
     }
 
     if (isGroup) {
+      console.log("isGroup", isGroup, members, name);
       const newConversation = await prismadb.conversation.create({
         data: {
           name,

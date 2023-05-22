@@ -1,5 +1,4 @@
 import prismadb from "@/app/libs/prismadb";
-import getSession from "@/app/actions/getSession";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 
 export default async function getConversations() {
