@@ -28,22 +28,41 @@ const ConversationBody = ({ initialMessages }: IConversationBodyProps) => {
 
   useEffect(() => {
     pusherClient.subscribe(conversationId);
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef?.current?.scrollIntoView();
 
     const messageHandler = (message: FullMessageType) => {
-      setMessages((prev) => {
-        if (find(prev, { id: message.id })) return prev;
-
-        return [...prev, message];
-      });
       axios.post(`/api/conversations/${conversationId}/seen`);
+
+      setMessages((current) => {
+        if (find(current, { id: message.id })) {
+          return current;
+        }
+
+        return [...current, message];
+      });
+
+      bottomRef?.current?.scrollIntoView();
+    };
+
+    const updateMessageHandler = (newMessage: FullMessageType) => {
+      setMessages((current) =>
+        current.map((currentMessage) => {
+          if (currentMessage.id === newMessage.id) {
+            return newMessage;
+          }
+
+          return currentMessage;
+        })
+      );
     };
 
     pusherClient.bind("messages:new", messageHandler);
+    pusherClient.bind("message:update", updateMessageHandler);
 
     return () => {
       pusherClient.unsubscribe(conversationId);
       pusherClient.unbind("messages:new", messageHandler);
+      pusherClient.unbind("message:update", updateMessageHandler);
     };
   }, [conversationId]);
 
